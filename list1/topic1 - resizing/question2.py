@@ -25,10 +25,10 @@ def converts_color_grayscale(image_rgb):
 
     # extract the color channels (R, G, B)
     r, g, b = image_rgb[..., 0], image_rgb[..., 1], image_rgb[..., 2]
-    
+
     # calculate grayscale intensity
     gray_intensity = 0.2989 * r + 0.5870 * g + 0.1140 * b
-    
+
     return gray_intensity
 
 def resizing_img(image, new_height, new_width):
