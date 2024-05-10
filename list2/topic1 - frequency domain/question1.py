@@ -92,12 +92,12 @@ def filtro_media(data, filter_size):
             temp = []
     return data
     
-def blur(a):
+def blur(img):
     kernel = np.array([[1.0,2.0,1.0], [2.0,4.0,2.0], [1.0,2.0,1.0]])
     kernel = kernel / np.sum(kernel)
     arraylist = []
     for y in range(3):
-        temparray = np.copy(a)
+        temparray = np.copy(img)
         temparray = np.roll(temparray, y - 1, axis=0)
         for x in range(3):
             temparray_X = np.copy(temparray)
@@ -123,13 +123,13 @@ a4_cinza = converter_para_escala_de_cinza(imagem_a4)
 # Suavizar imagens - Filtro de Media
 a1_media = filtro_media(a1_cinza, 3)
 a2_media = filtro_media(a2_cinza, 3)
-a3_media = filtro_media(a3_cinza, 4)
-a4_media = filtro_media(a4_cinza, 6)
+a3_media = filtro_media(a3_cinza, 3)
+a4_media = filtro_media(a4_cinza, 3)
 mostrar_imagem_e_histograma(imagem_a1, 'a1 - original', a1_media, 'a1 - media')
 mostrar_imagem_e_histograma(imagem_a2, 'a2 - original', a2_media, 'a2 - media')
 mostrar_imagem_e_histograma(imagem_a3, 'a3 - original', a3_media, 'a3 - media')
 mostrar_imagem_e_histograma(imagem_a4, 'a4 - original', a4_media, 'a4 - media')
-'''
+
 # Suavizar imagens - Filtro de Blur
 a1_blur = blur(a1_cinza)
 a2_blur = blur(a2_cinza)
@@ -150,4 +150,3 @@ salvar_imagem(a1_blur, 'list2/images/a1_blur.jpg')
 salvar_imagem(a2_blur, 'list2/images/a2_blur.jpg')
 salvar_imagem(a3_blur, 'list2/images/a3_blur.jpg')
 salvar_imagem(a4_blur, 'list2/images/a4_blur.jpg')
-'''
