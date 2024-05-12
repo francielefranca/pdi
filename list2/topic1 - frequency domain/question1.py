@@ -72,7 +72,7 @@ def suavizar_img(img_path, cutoff_frequency):
 
     return img_filtered
 
-# Suavizar imagens - Filtro de Media
+# Suavizar imagens 
 a1_suav = suavizar_img('list2/images/A1.webp', 0.5)
 a2_suav = suavizar_img('list2/images/A2.jpg', 0.2)
 a3_suav = suavizar_img('list2/images/A3.jpg', 0.3)

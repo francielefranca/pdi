@@ -3,30 +3,17 @@
 '''
 utilizar filtros de dominio de frequencia para aguçar as imagens:
 - sharp1
+
+Nesta função, calculamos a função H(u,v) com base no raio r 
+e aplicamos o filtro passa-alta multiplicando a transformada 
+de Fourier da imagem pela função H(u,v). 
+A imagem resultante realça as características de alta frequência. 
+
 '''
 
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-
-def carregar_imagem(caminho):
-    # Lê a imagem usando o OpenCV
-    imagem = cv2.imread(caminho)
-    #cv2.IMREAD_UNCHANGED
-    return imagem
-
-def converter_para_escala_de_cinza(imagem):
-    # Verifica o número de canais da imagem
-    num_canais = imagem.shape[2]
-
-    if num_canais > 1:
-        # Calcula a média dos canais de cor para obter a escala de cinza
-        imagem_escala_de_cinza = np.mean(imagem, axis=2, keepdims=True)
-    else:
-        # A imagem já está em escala de cinza (ou tem apenas um canal)
-        imagem_escala_de_cinza = imagem
-
-    return imagem_escala_de_cinza
 
 def mostrar_imagem_e_histograma(imagem, titulo, imgAgu, tituloAgu):
     plt.figure(figsize=(12, 6))  # Aumentei o tamanho da figura para acomodar os subplots
@@ -46,7 +33,7 @@ def mostrar_imagem_e_histograma(imagem, titulo, imgAgu, tituloAgu):
     # Mostra a imagem suavizada
     plt.subplot(2, 2, 3)  # Duas linhas, duas colunas, terceiro subplot
     plt.imshow(imgAgu, cmap='gray')
-    plt.title('Imagem Suavizada ' + tituloAgu)
+    plt.title('Imagem ' + tituloAgu)
 
     # Calcula e mostra o histograma da imagem suavizada
     plt.subplot(2, 2, 4)  # Duas linhas, duas colunas, quarto subplot
@@ -59,59 +46,50 @@ def mostrar_imagem_e_histograma(imagem, titulo, imgAgu, tituloAgu):
     plt.show()
 
 def salvar_imagem(imagem, caminho):
-    # Salva a imagem em escala de cinza
     cv2.imwrite(caminho, imagem)
 
-def apply_sharpening(image, alpha):
+def high_pass_filter(img_path, r):
     """
-    Aplica afiação (sharpening) em uma imagem em escala de cinza.
+    Aplica um filtro passa-alta em uma imagem.
 
     Args:
-        image (numpy.ndarray): Matriz da imagem em escala de cinza (valores de 0 a 255).
-        alpha (float): Fator de afiação (padrão é 1.0).
+        image (numpy.ndarray): A imagem de entrada (em escala de cinza).
+        r (float): O raio do filtro (limiar para a função H(u,v)).
 
     Returns:
-        numpy.ndarray: Imagem afiada.
+        numpy.ndarray: A imagem filtrada.
     """
-    # Crie um filtro de nitidez (sharpening filter)
-    sharpen_filter = np.array([[0, -1, 0],
-                               [-1, 5, -1],
-                               [0, -1, 0]])
+    img_data = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+    image = np.asarray(img_data)
+    rows, cols = image.shape
+    center_x, center_y = rows // 2, cols // 2
+    # Cria uma matriz de coordenadas (u, v) para calcular a distância do centro
+    u, v = np.meshgrid(np.arange(cols), np.arange(rows))
+    distance = np.sqrt((u - center_x)**2 + (v - center_y)**2)
 
-    # Aplica o filtro à imagem usando convolução 2D
-    sharpened_image = np.zeros_like(image, dtype=np.float64)
-    for i in range(1, image.shape[0] - 1):
-        for j in range(1, image.shape[1] - 1):
-            sharpened_image[i, j] = image[i, j] + alpha * np.sum(image[i-1:i+2, j-1:j+2] * sharpen_filter)
+    # Calcula a função H(u,v) com base no raio r
+    H = np.where(distance < r, 0, 1)
 
-    # Garante que os valores estejam no intervalo [0, 255]
-    sharpened_image = np.clip(sharpened_image, 0, 255).astype(np.uint8)
+    # Transformada de Fourier da imagem
+    f_transform = np.fft.fft2(image)
 
-    return sharpened_image
+    # Aplica o filtro multiplicando pela função H(u,v)
+    filtered_transform = f_transform * H
 
-# Carrega as imagens
-imagem_a1 = carregar_imagem('list2/images/a1.webp')
-imagem_a2 = carregar_imagem('list2/images/a2.jpg')
-imagem_a3 = carregar_imagem('list2/images/a3.jpg')
-imagem_a4 = carregar_imagem('list2/images/a4.jpg')
+    # Transformada inversa para obter a imagem filtrada
+    filtered_image = np.abs(np.fft.ifft2(filtered_transform))
 
-# Converte para escala de cinza
-a1_cinza = converter_para_escala_de_cinza(imagem_a1)
-a2_cinza = converter_para_escala_de_cinza(imagem_a2)
-a3_cinza = converter_para_escala_de_cinza(imagem_a3)
-a4_cinza = converter_para_escala_de_cinza(imagem_a4)
+    mostrar_imagem_e_histograma(img_data, 'original', filtered_image.astype(np.uint8), 'aguçada')
 
-# Suavizar imagens - Filtro de Sharp
-a1_sharp = apply_sharpening(a1_cinza, 1.5)
-a2_sharp = apply_sharpening(a2_cinza, 2.0)
-a3_sharp = apply_sharpening(a3_cinza, 2.0)
-a4_sharp = apply_sharpening(a4_cinza, 2.0)
-mostrar_imagem_e_histograma(imagem_a1, 'a1 - original', a1_sharp, 'a1 - sharp')
-mostrar_imagem_e_histograma(imagem_a2, 'a2 - original', a2_sharp, 'a2 - sharp')
-mostrar_imagem_e_histograma(imagem_a3, 'a3 - original', a3_sharp, 'a3 - sharp')
-mostrar_imagem_e_histograma(imagem_a4, 'a4 - original', a4_sharp, 'a4 - sharp')
+    return filtered_image.astype(np.uint8)
 
-# Salvando as imagens suavizadas
+# Aguçando as imagens
+a1_sharp = high_pass_filter('list2/images/A1.webp', 30)
+a2_sharp = high_pass_filter('list2/images/A2.jpg', 50)
+a3_sharp = high_pass_filter('list2/images/A3.jpg', 250)
+a4_sharp = high_pass_filter('list2/images/A4.jpg', 50)
+
+# Salvando as imagens aguçadas
 salvar_imagem(a1_sharp, 'list2/images/a1_sharp.jpg')
 salvar_imagem(a2_sharp, 'list2/images/a2_sharp.jpg')
 salvar_imagem(a3_sharp, 'list2/images/a3_sharp.jpg')
