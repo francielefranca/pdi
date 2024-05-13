@@ -72,11 +72,49 @@ def suavizar_img(img_path, cutoff_frequency):
 
     return img_filtered
 
+def mostrar_imagem_no_dominio_da_frequencia(img_path, segunda_imagem):
+    img_data = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+    imagem = np.asarray(img_data)
+
+    # Aplicar a transformada de Fourier
+    img_fft = np.fft.fft2(imagem)
+    img_fft_shifted = np.fft.fftshift(img_fft)
+
+    # Calcular o espectro de frequência (magnitude)
+    magnitude_spectrum = np.abs(img_fft_shifted)
+
+    # Visualizar o espectro de frequência
+    plt.figure(figsize=(12, 6))
+
+    # Primeira imagem no domínio da frequência
+    plt.subplot(1, 2, 1)
+    plt.imshow(np.log1p(magnitude_spectrum), cmap='gray')
+    plt.title('Espectro de Frequência - Original')
+    plt.axis('off')
+
+    segunda_img_fft = np.fft.fft2(segunda_imagem)
+    segunda_img_fft_shifted = np.fft.fftshift(segunda_img_fft)
+    segunda_magnitude_spectrum = np.abs(segunda_img_fft_shifted)
+
+    plt.subplot(1, 2, 2)
+    plt.imshow(np.log1p(segunda_magnitude_spectrum), cmap='gray')
+    plt.title('Espectro de Frequência - Suavizada')
+    plt.axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
 # Suavizar imagens 
 a1_suav = suavizar_img('list2/images/A1.webp', 0.5)
 a2_suav = suavizar_img('list2/images/A2.jpg', 0.2)
 a3_suav = suavizar_img('list2/images/A3.jpg', 0.3)
 a4_suav = suavizar_img('list2/images/A4.jpg', 0.2)
+
+# Mostrar as duas imagens no domínio da frequência
+mostrar_imagem_no_dominio_da_frequencia('list2/images/A1.webp', a1_suav)
+mostrar_imagem_no_dominio_da_frequencia('list2/images/A2.jpg', a2_suav)
+mostrar_imagem_no_dominio_da_frequencia('list2/images/A3.jpg', a3_suav)
+mostrar_imagem_no_dominio_da_frequencia('list2/images/A4.jpg', a4_suav)
 
 # Salvando as imagens suavizadas
 salvar_imagem(a1_suav, 'list2/images/a1_suav.jpg')

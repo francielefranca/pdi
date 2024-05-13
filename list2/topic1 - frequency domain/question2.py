@@ -48,17 +48,20 @@ def mostrar_imagem_e_histograma(imagem, titulo, imgAgu, tituloAgu):
 def salvar_imagem(imagem, caminho):
     cv2.imwrite(caminho, imagem)
 
+'''
+Valor Maior de r:
+Quando você aumenta o valor de r, o filtro passa-alta se torna mais seletivo em relação às frequências altas.
+Isso significa que apenas as bordas e detalhes mais significativos (com frequências mais altas) serão realçados.
+A imagem resultante terá menos ruído e menos detalhes finos.
+É útil quando você deseja realçar apenas as características mais proeminentes da imagem.
+Valor Menor de r:
+Com um valor menor de r, o filtro passa-alta se torna menos seletivo.
+Ele realçará mais detalhes de alta frequência, incluindo bordas finas e pequenos detalhes.
+A imagem resultante pode conter mais ruído e detalhes indesejados.
+É útil quando você deseja realçar todos os detalhes, mesmo os menos proeminentes.
+'''
+
 def high_pass_filter(img_path, r):
-    """
-    Aplica um filtro passa-alta em uma imagem.
-
-    Args:
-        image (numpy.ndarray): A imagem de entrada (em escala de cinza).
-        r (float): O raio do filtro (limiar para a função H(u,v)).
-
-    Returns:
-        numpy.ndarray: A imagem filtrada.
-    """
     img_data = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
     image = np.asarray(img_data)
     rows, cols = image.shape
@@ -83,14 +86,40 @@ def high_pass_filter(img_path, r):
 
     return filtered_image.astype(np.uint8)
 
-# Aguçando as imagens
-a1_sharp = high_pass_filter('list2/images/A1.webp', 30)
-a2_sharp = high_pass_filter('list2/images/A2.jpg', 50)
-a3_sharp = high_pass_filter('list2/images/A3.jpg', 250)
-a4_sharp = high_pass_filter('list2/images/A4.jpg', 50)
+def mostrar_imagem_no_dominio_da_frequencia(img_path, segunda_imagem):
+    img_data = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+    imagem = np.asarray(img_data)
 
+    # Aplicar a transformada de Fourier
+    img_fft = np.fft.fft2(imagem)
+    img_fft_shifted = np.fft.fftshift(img_fft)
+
+    # Calcular o espectro de frequência (magnitude)
+    magnitude_spectrum = np.abs(img_fft_shifted)
+
+    # Visualizar o espectro de frequência
+    plt.figure(figsize=(12, 6))
+
+    # Primeira imagem no domínio da frequência
+    plt.subplot(1, 2, 1)
+    plt.imshow(np.log1p(magnitude_spectrum), cmap='gray')
+    plt.title('Espectro de Frequência - Original')
+    plt.axis('off')
+
+    segunda_img_fft = np.fft.fft2(segunda_imagem)
+    segunda_img_fft_shifted = np.fft.fftshift(segunda_img_fft)
+    segunda_magnitude_spectrum = np.abs(segunda_img_fft_shifted)
+
+    plt.subplot(1, 2, 2)
+    plt.imshow(np.log1p(segunda_magnitude_spectrum), cmap='gray')
+    plt.title('Espectro de Frequência - Suavizada')
+    plt.axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+# Aguçando as imagens
+sharp1 = high_pass_filter('list2/images/sharp1.png', 60)
+mostrar_imagem_no_dominio_da_frequencia('list2/images/sharp1.png', sharp1)
 # Salvando as imagens aguçadas
-salvar_imagem(a1_sharp, 'list2/images/a1_sharp.jpg')
-salvar_imagem(a2_sharp, 'list2/images/a2_sharp.jpg')
-salvar_imagem(a3_sharp, 'list2/images/a3_sharp.jpg')
-salvar_imagem(a4_sharp, 'list2/images/a4_sharp.jpg')
+salvar_imagem(sharp1, 'list2/images/sharp_high.jpg')
