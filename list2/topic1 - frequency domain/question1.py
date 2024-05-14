@@ -6,6 +6,8 @@ utilizar filtros de dominio de frequencia para suavizar as imagens:
 - a2
 - a3
 - a4
+
+model for colab: "/content/drive/MyDrive/pdi241/lista2/a1_sharp.jpg"
 '''
 
 import cv2
