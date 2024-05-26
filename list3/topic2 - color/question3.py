@@ -91,28 +91,6 @@ def filtro_media(imagem):
     
     return imagem_filtrada
 
-def filtro_gaussiano(imagem):
-    # Tamanho da janela de média
-    janela = 5
-    
-    # Criando o kernel gaussiano
-    kernel = np.ones((janela, janela)) / (janela ** 2)
-    
-    # Criando arrays 3D para os canais de cores
-    canal_r = np.zeros_like(imagem)
-    canal_g = np.zeros_like(imagem)
-    canal_b = np.zeros_like(imagem)
-    
-    for i in range(3):
-        canal_r[:, :, i] = np.convolve(imagem[:, :, i].ravel(), kernel.ravel(), mode="same").reshape(imagem.shape[:2])
-        canal_g[:, :, i] = np.convolve(imagem[:, :, i].ravel(), kernel.ravel(), mode="same").reshape(imagem.shape[:2])
-        canal_b[:, :, i] = np.convolve(imagem[:, :, i].ravel(), kernel.ravel(), mode="same").reshape(imagem.shape[:2])
-    
-    # Criando a imagem filtrada
-    imagem_filtrada = np.stack([canal_r, canal_g, canal_b], axis=-1)
-    
-    return imagem_filtrada
-
 def remove_salt_and_pepper_noise(image, window_size=5):
     """
     Remove ruído de sal e pimenta de uma imagem colorida.
@@ -154,11 +132,3 @@ plot_histograms(rachadura_ar, rachadura_salt, 'Histograma Original', 'Histograma
 
 salvar_imagem(escada_gauss, 'list3/images/escada_gauss.jpeg')
 salvar_imagem(rachadura_salt, 'list3/images/rachadura_salt.jpeg')
-
-escada_gg = filtro_gaussiano(escada)
-plot_original_and_noisy(escada_ar, escada_gg)
-plot_histograms(escada_ar, escada_gg, 'Histograma Original', 'Histograma Sem Ruído (Gauss-Gauss)', 'escada')
-
-salvar_imagem(escada_gg, 'list3/images/escada_gg.jpeg')
-
-

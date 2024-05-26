@@ -112,6 +112,15 @@ def comprimir_com_perdas_subamostragem(imagem, fator):
 
     return imagem_comprimida
 
+def calcular_redundancia_taxa_compressao(imagem_original, imagem_comprimida):
+    tamanho_original = imagem_original.size
+    tamanho_comprimido = imagem_comprimida.size
+
+    redundancia_relativa = 1 - (tamanho_comprimido / tamanho_original)
+    taxa_compressao = tamanho_original / tamanho_comprimido
+
+    return redundancia_relativa, taxa_compressao
+
 # Carregando as imagens
 capivara = cv2.imread("list3/images/capivara-3.webp", cv2.IMREAD_GRAYSCALE)
 commander = cv2.imread("list3/images/commander.jpg", cv2.IMREAD_GRAYSCALE)
@@ -137,6 +146,22 @@ plot_histograms(passarela_ar, passarela_inter, 'Histograma Original', 'Histogram
 plot_original_and_compressed(wagner, wagner_inter)
 plot_histograms(wagner_ar, wagner_inter, 'Histograma Original', 'Histograma Comprimido (INTER)', 'wagner')
 
+cap_red_inter, cap_taxa_inter = calcular_redundancia_taxa_compressao(capivara_ar, capivara_inter)
+print(f"Redundância Relativa (Interpolação Linear) - Capivara: {cap_red_inter:.4f}")
+print(f"Taxa de Compressão (Interpolação Linear) - Capivara: {cap_taxa_inter:.4f}")
+
+com_red_inter, com_taxa_inter = calcular_redundancia_taxa_compressao(commander_ar, commander_inter)
+print(f"Redundância Relativa (Interpolação Linear) - Commander: {com_red_inter:.4f}")
+print(f"Taxa de Compressão (Interpolação Linear) - Commander: {com_taxa_inter:.4f}")
+
+pas_red_inter, pas_taxa_inter = calcular_redundancia_taxa_compressao(passarela_ar, passarela_inter)
+print(f"Redundância Relativa (Interpolação Linear) - Passarela: {pas_red_inter:.4f}")
+print(f"Taxa de Compressão (Interpolação Linear) - Passarela: {pas_taxa_inter:.4f}")
+
+wag_red_inter, wag_taxa_inter = calcular_redundancia_taxa_compressao(wagner_ar, wagner_inter)
+print(f"Redundância Relativa (Interpolação Linear) - Wagner: {wag_red_inter:.4f}")
+print(f"Taxa de Compressão (Interpolação Linear) - Wagner: {wag_taxa_inter:.4f}")
+
 salvar_imagem(capivara_inter, 'list3/images/capivara_inter.jpeg')
 salvar_imagem(commander_inter, 'list3/images/commander_inter.jpeg')
 salvar_imagem(passarela_inter, 'list3/images/passarela_inter.jpeg')
@@ -155,6 +180,22 @@ plot_original_and_compressed(passarela, passarela_sub)
 plot_histograms(passarela_ar, passarela_sub, 'Histograma Original', 'Histograma Comprimido (SUB)', 'passarela')
 plot_original_and_compressed(wagner, wagner_sub)
 plot_histograms(wagner_ar, wagner_sub, 'Histograma Original', 'Histograma Comprimido (SUB)', 'wagner')
+
+cap_red_sub, cap_taxa_sub = calcular_redundancia_taxa_compressao(capivara_ar, capivara_sub)
+print(f"Redundância Relativa (Subamostragem) - Capivara: {cap_red_inter:.4f}")
+print(f"Taxa de Compressão (Subamostragem) - Capivara: {cap_taxa_inter:.4f}")
+
+com_red_sub, com_taxa_sub = calcular_redundancia_taxa_compressao(commander_ar, commander_sub)
+print(f"Redundância Relativa (Subamostragem) - Commander: {com_red_sub:.4f}")
+print(f"Taxa de Compressão (Subamostragem) - Commander: {com_taxa_sub:.4f}")
+
+pas_red_sub, pas_taxa_sub = calcular_redundancia_taxa_compressao(passarela_ar, passarela_sub)
+print(f"Redundância Relativa (Subamostragem) - Passarela: {pas_red_sub:.4f}")
+print(f"Taxa de Compressão (Subamostragem) - Passarela: {pas_taxa_sub:.4f}")
+
+wag_red_sub, wag_taxa_sub = calcular_redundancia_taxa_compressao(wagner_ar, wagner_sub)
+print(f"Redundância Relativa (Subamostragem) - Wagner: {wag_red_sub:.4f}")
+print(f"Taxa de Compressão (Subamostragem) - Wagner: {wag_taxa_sub:.4f}")
 
 salvar_imagem(capivara_sub, 'list3/images/capivara_sub.webp')
 salvar_imagem(commander_sub, 'list3/images/commander_sub.webp')
